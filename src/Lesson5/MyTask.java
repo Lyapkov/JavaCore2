@@ -1,11 +1,11 @@
 package Lesson5;
 
-public class MyThread implements Runnable {
+public class MyTask implements Runnable {
 
     private int h;
     private float[] arr;
 
-    MyThread(int h){
+    MyTask(int h){
         this.h = h;
         arr = new float[h];
     }

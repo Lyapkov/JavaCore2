@@ -32,8 +32,8 @@ class General {
         System.arraycopy(arr, 0, a1, 0, h);
         System.arraycopy(arr, h, a2, 0, h);
 
-        MyThread t1 = new MyThread(h);
-        MyThread t2 = new MyThread(h);
+        MyTask t1 = new MyTask(h);
+        MyTask t2 = new MyTask(h);
         Thread mt1 = new Thread(t1);
         Thread mt2 = new Thread(t2);
         mt1.start();
