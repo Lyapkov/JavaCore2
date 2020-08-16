@@ -4,6 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ClientHandler {
 
@@ -11,6 +14,8 @@ public class ClientHandler {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private final ScheduledExecutorService scheduledExecutor = new ScheduledThreadPoolExecutor(1);
+    private boolean isAuthorization = false;
 
     private String name;
 
@@ -23,6 +28,7 @@ public class ClientHandler {
             this.name = "";
             new Thread( () -> {
                 try {
+                    scheduledExecutor.schedule(() -> checkAuthorization(), 120, TimeUnit.SECONDS);
                     authentication();
                     readMessages();
                 } catch (IOException e) {
@@ -48,6 +54,7 @@ public class ClientHandler {
                 String nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
                 if (nick != null) {
                     if (!myServer.isNickBusy(nick)) {
+                        isAuthorization = true;
                         sendMsg("/authok" + nick);
                         name = nick;
                         myServer.broadcastMsg(name + " зашел в чат");
@@ -116,6 +123,12 @@ public class ClientHandler {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void checkAuthorization(){
+        if (!isAuthorization) {
+            closeConnection();
         }
     }
 
